@@ -1,0 +1,8 @@
+{
+    "env":{
+        "MONGO_USER":"malik",
+        "MONGO_PWD":"malik",
+        "DB_NAME":"test-db",
+        "JWT_KEY":"thisissupersecretkey"
+    }
+}

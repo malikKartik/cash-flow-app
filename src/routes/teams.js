@@ -1,0 +1,6 @@
+const express = require('express')
+const router = express.Router()
+
+const teamController = require('../controllers/teams')
+
+router.post('/create',teamController.createTeam)

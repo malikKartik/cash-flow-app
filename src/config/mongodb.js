@@ -1,0 +1,1 @@
+exports.MONGO_URI = 'mongodb+srv://malik:malik@businessideas-dhipt.mongodb.net/test-db?retryWrites=true&w=majority'
