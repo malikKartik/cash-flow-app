@@ -13,11 +13,11 @@ const teamSchema = mongoose.Schema({
     },
     secret:{type:String,required:true},
     users:[{type:mongoose.Schema.Types.ObjectId,ref:"user"}],
-    transactions:[
-        {
-            from:[{type:mongoose.Schema.Types.ObjectId}],
-            to:[{type:mongoose.Schema.Types.ObjectId}],
-            amount:[{type:Number}]
-        }
-    ]
+    transactions:{
+        from:[{type:mongoose.Schema.Types.ObjectId}],
+        to:[{type:mongoose.Schema.Types.ObjectId}],
+        amount:[{type:Number}]
+    }
 })
+
+module.exports = mongoose.model('Team',teamSchema)

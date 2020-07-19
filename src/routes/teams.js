@@ -4,3 +4,5 @@ const router = express.Router()
 const teamController = require('../controllers/teams')
 
 router.post('/create',teamController.createTeam)
+
+module.exports = router

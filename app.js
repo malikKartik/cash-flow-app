@@ -28,7 +28,7 @@ app.use(morgan('dev'));
 // All end points
 app.use('/uploads',express.static('uploads'))
 app.use('api/users',userRoutes)
-app.use('/api/team',teamRoutes)
+app.use('/api/teams',teamRoutes)
 
 // Handling errors
 app.use((req,res,next)=>{
