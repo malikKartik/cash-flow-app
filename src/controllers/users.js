@@ -5,8 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 exports.getUsers = (req, res, next) => {
-  User.find()
-    .populate("teams", "teamName")
+  User.find().populate('teams')
     .exec()
     .then((result) => res.status(201).json(result))
     .catch((err) =>

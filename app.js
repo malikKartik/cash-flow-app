@@ -22,14 +22,14 @@ app.use((req,res,next)=>{
 
 const userRoutes = require('./src/routes/users')
 const teamRoutes = require('./src/routes/teams')
-
+const transactionRoutes = require('./src/routes/transactions')
 app.use(morgan('dev'));
 
 // All end points
 app.use('/uploads',express.static('uploads'))
 app.use('/api/users',userRoutes)
 app.use('/api/teams',teamRoutes)
-
+app.use('/api/transactions',transactionRoutes)
 // Handling errors
 app.use((req,res,next)=>{
     const error = new Error('Not found!')
