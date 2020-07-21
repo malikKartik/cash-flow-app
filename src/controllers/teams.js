@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Team = require("../models/team");
 const User = require("../models/user");
+const { findOne } = require("../models/team");
 
 exports.getTeams = (req, res, next) => {
   Team.find()
@@ -34,8 +35,11 @@ exports.createTeam = async (req, res, next) => {
         amount: [],
       },
     };
+    await User.findOneAndUpdate({_id:req.body.userid},{ "$push": { "teams": team._id } })
     const newTeam = new Team(team);
     await newTeam.save();
+    
+    
     res.send(team);
   } catch (e) {
     console.log(e);
