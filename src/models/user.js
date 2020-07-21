@@ -5,7 +5,7 @@ const userSchema = mongoose.Schema({
     email: {type: String, required: true,unique:true},
     username: {type: String, required: true,unique:true},
     password: {type:String, required: true},
-    teams: [{type:mongoose.Schema.Types.ObjectId,ref:'team'}]
+    teams: [{type:mongoose.Schema.Types.ObjectId,ref:'Team'}]
 })
 
 module.exports = mongoose.model('User',userSchema)

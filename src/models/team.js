@@ -12,7 +12,7 @@ const teamSchema = mongoose.Schema({
         unique:true
     },
     secret:{type:String,required:true},
-    users:[{type:mongoose.Schema.Types.ObjectId,ref:"user"}],
+    users:[{type:mongoose.Schema.Types.ObjectId,ref:"User"}],
     transactions:{
         from:[{type:mongoose.Schema.Types.ObjectId}],
         to:[{type:mongoose.Schema.Types.ObjectId}],
