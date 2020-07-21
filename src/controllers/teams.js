@@ -5,7 +5,7 @@ const { findOne } = require("../models/team");
 
 exports.getTeams = (req, res, next) => {
   Team.find()
-
+    .populate("users", "email")
     .exec()
     .then((result) => res.status(201).json(result))
     .catch((err) =>
@@ -35,11 +35,13 @@ exports.createTeam = async (req, res, next) => {
         amount: [],
       },
     };
-    await User.findOneAndUpdate({_id:req.body.userid},{ "$push": { "teams": team._id } })
+    await User.findOneAndUpdate(
+      { _id: req.body.userid },
+      { $push: { teams: team._id } }
+    );
     const newTeam = new Team(team);
     await newTeam.save();
-    
-    
+
     res.send(team);
   } catch (e) {
     console.log(e);
@@ -55,24 +57,25 @@ exports.addUser = (req, res, next) => {
     .then((user) => {
       let teams = [];
       teams = user.teams;
+      if (teams.includes(teamId))
+        return res.send("User already a part of this team!");
       let userId = user._id;
       teams.push(teamId);
       User.findOneAndUpdate({ _id: userId }, { teams: teams })
         .exec()
         .then((resp) => {
-          Team.findById({ _id: teamId })
-            .exec()
-            .then((team) => {
-              let arr = [];
-              arr = team.users;
-              arr.push(userId);
-              Team.findOneAndUpdate({ _id: teamId }, { users: arr })
-                .exec()
-                .then((result) => {
-                  res.status(201).json(result);
-                });
-            });
+          Team.findOneAndUpdate(
+            { _id: teamId },
+            { $push: { users: userId } },
+            (err, team) => {
+              if (err) res.status(500).json({ error: err });
+              else res.json(team);
+            }
+          );
         });
+    })
+    .catch((err) => {
+      res.json({ error: err });
     });
 };
 
@@ -85,6 +88,8 @@ exports.joinTeam = (req, res, next) => {
     .then((team) => {
       if (team == null) return res.send("Team not found");
       if (team.secret != secret) return res.send("Incorrect password");
+      if (team.users.includes(userId))
+        return res.send("user already exits in team");
       let users = [];
       users = team.users;
       let teamUid = team._id;
@@ -92,18 +97,17 @@ exports.joinTeam = (req, res, next) => {
       Team.findOneAndUpdate({ _id: team._id }, { users: users })
         .exec()
         .then((result) => {
-          User.findById({ _id: userId })
-            .exec()
-            .then((user) => {
-              let teams = [];
-              teams = user.teams;
-              teams.push(teamUid);
-              User.findOneAndUpdate({ _id: userId }, { teams: teams })
-                .exec()
-                .then((resp) => {
-                  res.json(resp);
-                });
-            });
+          User.findOneAndUpdate(
+            { _id: userId },
+            { $push: { teams: teamUid } },
+            (err, user) => {
+              if (err) res.status(500).json({ error: err });
+              else res.json(user);
+            }
+          );
         });
+    })
+    .catch((err) => {
+      res.json({ error: err });
     });
 };
