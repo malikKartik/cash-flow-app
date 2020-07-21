@@ -6,7 +6,7 @@ const User = require("../models/user");
 
 exports.getUsers = (req, res, next) => {
   User.find()
-
+    .populate("teams", "teamName")
     .exec()
     .then((result) => res.status(201).json(result))
     .catch((err) =>
