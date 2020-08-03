@@ -1,12 +1,14 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 
 const {MONGO_URI} = require('./src/config/mongodb')
 
 const app = express();
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
+app.use(cookieParser());
 
 mongoose.connect(MONGO_URI)
 

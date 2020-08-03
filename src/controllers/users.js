@@ -84,9 +84,11 @@ exports.login = (req, res, next) => {
             },
             process.env.JWT_KEY || "key"
           );
+          res.cookie('jwt',token,{
+            httpOnly:true
+          })
           return res.json({
-            message: "Success!",
-            token: token,
+            message: "Success!"
           });
         }
         return res.status(401).json({
@@ -101,3 +103,8 @@ exports.login = (req, res, next) => {
       });
     });
 };
+
+exports.logout = (req,res,next) =>{
+  res.clearCookie('jwt')
+  res.json({message:"Success!"})
+}
