@@ -102,3 +102,19 @@ exports.login = (req, res, next) => {
       });
     });
 };
+
+exports.getMyTeams = (req, res, next) => {
+  const jwt = req.body.jwt;
+  const userId = Buffer.from(jwt.split(".")[1], "base64")
+    .toString()
+    .substring(11, 35);
+  User.findById({ _id: userId })
+    .populate("teams", "teamName")
+    .exec()
+    .then((result) => res.status(201).json(result.teams))
+    .catch((err) =>
+      res.status(500).json({
+        error: err,
+      })
+    );
+};

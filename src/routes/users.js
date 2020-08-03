@@ -9,5 +9,6 @@ router.post("/login", userController.login);
 
 router.delete("/:userid", userController.delete_a_user);
 router.get("/getUsers", userController.getUsers);
+router.get("/getMyTeams", userController.getMyTeams);
 
 module.exports = router;
