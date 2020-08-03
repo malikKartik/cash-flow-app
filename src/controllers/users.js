@@ -104,10 +104,8 @@ exports.login = (req, res, next) => {
 };
 
 exports.getMyTeams = (req, res, next) => {
-  const jwt = req.body.jwt;
-  const userId = Buffer.from(jwt.split(".")[1], "base64")
-    .toString()
-    .substring(11, 35);
+  const tok = req.body.token;
+  const userId = jwt.decode(tok).userid;
   User.findById({ _id: userId })
     .populate("teams", "teamName")
     .exec()
