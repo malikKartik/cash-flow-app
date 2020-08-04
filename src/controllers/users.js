@@ -104,7 +104,6 @@ exports.login = (req, res, next) => {
     });
 };
 
-<<<<<<< HEAD
 exports.getMyTeams = (req, res, next) => {
   const tok = req.body.token;
   const userId = jwt.decode(tok).userid;
@@ -118,9 +117,7 @@ exports.getMyTeams = (req, res, next) => {
       })
     );
 };
-=======
 exports.logout = (req,res,next) =>{
   res.clearCookie('jwt')
   res.json({message:"Success!"})
 }
->>>>>>> 875a39ad95268bb1642df8422cb076e5302a4bc8
