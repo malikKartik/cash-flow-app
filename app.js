@@ -15,6 +15,7 @@ mongoose.connect(MONGO_URI)
 app.use((req,res,next)=>{
     res.header('Access-Control-Allow-Origin','*')
     res.header('Access-Control-Allow-Headers','*')
+    res.setHeader('Access-Control-Allow-Headers', 'Set-Cookie')
     if(req.method === 'OPTIONS'){
         res.header('Access-Control-Allow-Methods','PUT,POST,PATCH,DELETE,GET')
         return res.status(200).json({})
