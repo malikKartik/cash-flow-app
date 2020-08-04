@@ -104,6 +104,19 @@ exports.login = (req, res, next) => {
     });
 };
 
+exports.getMyTeams = (req, res, next) => {
+  const tok = req.body.token;
+  const userId = jwt.decode(tok).userid;
+  User.findById({ _id: userId })
+    .populate("teams", "teamName")
+    .exec()
+    .then((result) => res.status(201).json(result.teams))
+    .catch((err) =>
+      res.status(500).json({
+        error: err,
+      })
+    );
+};
 exports.logout = (req,res,next) =>{
   res.clearCookie('jwt')
   res.json({message:"Success!"})
