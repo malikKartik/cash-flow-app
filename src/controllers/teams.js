@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Team = require("../models/team");
 const User = require("../models/user");
-const { findOne } = require("../models/team");
 
 exports.getTeams = (req, res, next) => {
   Team.find()
@@ -14,6 +13,7 @@ exports.getTeams = (req, res, next) => {
       })
     );
 };
+
 
 exports.createTeam = async (req, res, next) => {
   try {

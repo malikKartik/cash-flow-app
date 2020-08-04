@@ -5,8 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 exports.getUsers = (req, res, next) => {
-  User.find()
-    .populate("teams", "teamName")
+  User.find().populate('teams')
     .exec()
     .then((result) => res.status(201).json(result))
     .catch((err) =>
@@ -85,9 +84,11 @@ exports.login = (req, res, next) => {
             },
             process.env.JWT_KEY || "key"
           );
+          res.cookie('jwt',token,{
+            httpOnly:true
+          })
           return res.json({
-            message: "Success!",
-            token: token,
+            message: "Success!"
           });
         }
         return res.status(401).json({
@@ -103,6 +104,7 @@ exports.login = (req, res, next) => {
     });
 };
 
+<<<<<<< HEAD
 exports.getMyTeams = (req, res, next) => {
   const tok = req.body.token;
   const userId = jwt.decode(tok).userid;
@@ -116,3 +118,9 @@ exports.getMyTeams = (req, res, next) => {
       })
     );
 };
+=======
+exports.logout = (req,res,next) =>{
+  res.clearCookie('jwt')
+  res.json({message:"Success!"})
+}
+>>>>>>> 875a39ad95268bb1642df8422cb076e5302a4bc8

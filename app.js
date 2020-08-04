@@ -1,12 +1,14 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 
 const {MONGO_URI} = require('./src/config/mongodb')
 
 const app = express();
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
+app.use(cookieParser());
 
 mongoose.connect(MONGO_URI)
 
@@ -22,14 +24,14 @@ app.use((req,res,next)=>{
 
 const userRoutes = require('./src/routes/users')
 const teamRoutes = require('./src/routes/teams')
-
+const transactionRoutes = require('./src/routes/transactions')
 app.use(morgan('dev'));
 
 // All end points
 app.use('/uploads',express.static('uploads'))
 app.use('/api/users',userRoutes)
 app.use('/api/teams',teamRoutes)
-
+app.use('/api/transactions',transactionRoutes)
 // Handling errors
 app.use((req,res,next)=>{
     const error = new Error('Not found!')
