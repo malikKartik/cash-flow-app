@@ -1,0 +1,8 @@
+{
+    "emmet.syntaxProfiles": {
+        "javascript":"jsx"
+    },
+    "folders": [],
+    "settings": {},
+    "editor.formatOnSave": true,
+}
