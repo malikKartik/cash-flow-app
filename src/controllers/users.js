@@ -18,7 +18,7 @@ exports.getUsers = (req, res, next) => {
 
 exports.create_a_user = (req, res, next) => {
   User.find({
-    $or: [{email: req.body.email}, {username: req.body.username}],
+    $or: [{email: req.body.email}, {username: req.body.usename}],
   }).then((data) => {
     if (data.length >= 1) {
       return res.status(409).json({
@@ -73,6 +73,7 @@ exports.delete_a_user = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
+  console.log(req.body);
   User.find({$or: [{email: req.body.username}, {username: req.body.username}]})
     .populate('teams')
     .then((user) => {
@@ -94,7 +95,7 @@ exports.login = (req, res, next) => {
             httpOnly: true,
           });
           return res.json({
-            token,
+            token: token,
             email: user[0].email,
             userId: user[0]._id,
             username: user[0].username,
