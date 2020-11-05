@@ -46,14 +46,16 @@ exports.createTeam = async (req, res, next) => {
 
 exports.addUser = (req, res, next) => {
   const teamId = req.body.teamid;
-  const email = req.body.email;
-  User.findOne({email: email})
+  User.findOne({
+    $or: [{email: req.body.username}, {username: req.body.username}],
+  })
     .exec()
     .then((user) => {
+      console.log(user);
       let teams = [];
       teams = user.teams;
       if (teams.includes(teamId))
-        return res.send('User already a part of this team!');
+        return res.json({message: 'User already a part of this team!'});
       let userId = user._id;
       teams.push(teamId);
       User.findOneAndUpdate({_id: userId}, {teams: teams})
@@ -64,7 +66,7 @@ exports.addUser = (req, res, next) => {
             {$push: {users: userId}},
             (err, team) => {
               if (err) res.status(500).json({error: err});
-              else res.json(team);
+              else res.json(user);
             },
           );
         });
@@ -97,12 +99,23 @@ exports.joinTeam = (req, res, next) => {
             {$push: {teams: teamUid}},
             (err, user) => {
               if (err) res.status(500).json({error: err});
-              else res.json(user);
+              else res.json(result);
             },
           );
         });
     })
     .catch((err) => {
       res.json({error: err});
+    });
+};
+
+exports.getTeamById = (req, res, next) => {
+  Team.findById(req.body.id)
+    .populate('users', '_id username firstName lastName')
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
     });
 };
