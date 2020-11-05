@@ -75,8 +75,9 @@ exports.delete_a_user = (req, res, next) => {
 exports.login = (req, res, next) => {
   console.log(req.body);
   User.find({$or: [{email: req.body.username}, {username: req.body.username}]})
-    .populate('teams')
+    .populate('teams', 'teamName')
     .then((user) => {
+      console.log(user);
       if (user.length < 1) {
         return res.status(401).json({
           message: 'Auth failed!',
@@ -138,7 +139,7 @@ exports.validate = async (req, res, next) => {
     if (!token) res.status(401).send({error: 'Not authorized!'});
     const decoded = jwt.verify(token, process.env.JWT_KEY || 'key');
     const userId = decoded.userId;
-    const user = await User.find({_id: userId});
+    const user = await User.find({_id: userId}).populate('teams', 'teamName');
     res.send({
       email: user[0].email,
       userId: user[0]._id,
