@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
+
+let otpMap = new Map();
 
 exports.getUsers = (req, res, next) => {
   User.find()
@@ -17,44 +20,51 @@ exports.getUsers = (req, res, next) => {
 };
 
 exports.create_a_user = (req, res, next) => {
-  User.find({
-    $or: [{email: req.body.email}, {username: req.body.usename}],
-  }).then((data) => {
-    if (data.length >= 1) {
-      return res.status(409).json({
-        message: 'Email exists!',
-      });
-    } else {
-      bcrypt.hash(req.body.password, 8, (err, hash) => {
-        if (err) {
-          return res.status(500).json({
-            error: err,
-          });
-        } else {
-          const user = new User({
-            _id: mongoose.Types.ObjectId(),
-            email: req.body.email,
-            password: hash,
-            username: req.body.username,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-          });
-          user
-            .save()
-            .then((data) => {
-              res.json({
-                message: 'User created!',
-                id: data._id,
-                email: data.email,
-              });
-            })
-            .catch((e) => {
-              console.log(e);
+  if (req.body.otp == otpMap.get(req.body.email)) {
+    console.log('otp correct!');
+    User.find({
+      $or: [{email: req.body.email}, {username: req.body.usename}],
+    }).then((data) => {
+      if (data.length >= 1) {
+        return res.status(409).json({
+          message: 'Email exists!',
+        });
+      } else {
+        bcrypt.hash(req.body.password, 8, (err, hash) => {
+          if (err) {
+            return res.status(500).json({
+              error: err,
             });
-        }
-      });
-    }
-  });
+          } else {
+            const user = new User({
+              _id: mongoose.Types.ObjectId(),
+              email: req.body.email,
+              password: hash,
+              username: req.body.username,
+              firstName: req.body.firstName,
+              lastName: req.body.lastName,
+            });
+            user
+              .save()
+              .then((data) => {
+                res.json({
+                  message: 'User created!',
+                  id: data._id,
+                  email: data.email,
+                });
+              })
+              .catch((e) => {
+                console.log(e);
+              });
+          }
+        });
+      }
+    });
+  } else {
+    res.json({
+      message: 'Incorrect OTP!',
+    });
+  }
 };
 
 exports.delete_a_user = (req, res, next) => {
@@ -156,4 +166,34 @@ exports.validate = async (req, res, next) => {
 exports.logout = (req, res, next) => {
   res.clearCookie('jwt');
   res.json({message: 'Success!'});
+};
+
+exports.sendOtp = (req, res, next) => {
+  let otp = Math.floor(Math.random() * 100000000);
+  otpMap.set(req.body.email, otp);
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'thecashflowapp@gmail.com',
+      pass: 'jmqstpokoibexbil',
+    },
+  });
+
+  const mailOptions = {
+    from: 'thecashflowapp@gmail.com',
+    to: req.body.email,
+    subject: 'CashFlow one time password',
+    text: 'Your one time password is ' + otp,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      res.status(500).json(error);
+      console.log(error);
+    } else {
+      res.status(200).json(info.response);
+      console.log('Email sent: ' + info.response);
+      console.log(otpMap);
+    }
+  });
 };

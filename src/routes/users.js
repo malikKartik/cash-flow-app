@@ -10,5 +10,6 @@ router.delete('/:userid', userController.delete_a_user);
 router.get('/getUsers', userController.getUsers);
 router.get('/getMyTeams', userController.getMyTeams);
 router.get('/logout', auth, userController.logout);
+router.post('/sendOtp', userController.sendOtp);
 
 module.exports = router;
