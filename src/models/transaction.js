@@ -5,6 +5,7 @@ const transactionSchema = mongoose.Schema({
   to: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
   from: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
   amount: {type: Number, required: true},
+  settled: {type: Boolean, default: false},
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);
