@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const teamSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
@@ -11,13 +11,9 @@ const teamSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
-  secret: { type: String, required: true },
-  users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  transactions: {
-    from: [{ type: mongoose.Schema.Types.ObjectId }],
-    to: [{ type: mongoose.Schema.Types.ObjectId }],
-    amount: [{ type: Number }],
-  },
+  secret: {type: String, required: true},
+  users: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+  places: [{type: mongoose.Schema.Types.ObjectId, ref: 'Place'}],
 });
 
-module.exports = mongoose.model("Team", teamSchema);
+module.exports = mongoose.model('Team', teamSchema);
