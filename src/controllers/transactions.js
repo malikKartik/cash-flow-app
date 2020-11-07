@@ -44,3 +44,13 @@ exports.removeTransactions = (req, res, next) => {
   try {
   } catch (e) {}
 };
+
+exports.settleTransaction = (req, res, next) => {
+  Transaction.findByIdAndUpdate(req.body.id, {settled: true})
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+};
