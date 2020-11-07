@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {populate} = require('../models/team');
 const Team = require('../models/team');
 const User = require('../models/user');
 
@@ -112,10 +113,19 @@ exports.joinTeam = (req, res, next) => {
 exports.getTeamById = (req, res, next) => {
   Team.findById(req.body.id)
     .populate('users', '_id username firstName lastName')
+    .populate('places')
+    .populate({
+      path: 'places',
+      populate: {
+        path: 'transactions',
+        model: 'Transaction',
+      },
+    })
     .then((data) => {
       res.status(200).json(data);
     })
     .catch((err) => {
+      console.log(err);
       res.status(500).json(err);
     });
 };
