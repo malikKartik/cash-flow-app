@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
+const successCodes = require('../responseCodes/successCodes').successCodes;
 
 let otpMap = new Map();
 
@@ -105,7 +106,7 @@ exports.login = (req, res, next) => {
           res.cookie('jwt', token, {
             httpOnly: true,
           });
-          return res.json({
+          return res.status(successCodes.LOGIN.status).json({
             token: token,
             email: user[0].email,
             userId: user[0]._id,
@@ -113,7 +114,8 @@ exports.login = (req, res, next) => {
             firstName: user[0].firstName,
             lastName: user[0].lastName,
             teams: user[0].teams,
-            message: 'Success!',
+            MESSAGE: successCodes.LOGIN.message,
+            CODE: successCodes.LOGIN.code,
           });
         }
         return res.status(401).json({
