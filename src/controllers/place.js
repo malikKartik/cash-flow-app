@@ -27,4 +27,17 @@ exports.getTransactions = (req, res, next) => {
     });
 };
 
-exports.settleAllTransactions = (req, res, next) => {};
+exports.settleAllTransactions = async (req, res, next) => {
+  try {
+    let place = await Place.findById(req.body.id).populate('transactions');
+    await place.transactions.forEach((element) => {
+      console.log(element);
+      element.settled = true;
+      element.save();
+    });
+    res.status(200).json(place);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({error: err});
+  }
+};
