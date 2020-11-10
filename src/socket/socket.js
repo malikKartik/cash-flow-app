@@ -3,14 +3,29 @@ const io = require('../../app').io;
 exports.Socket = (socket) => {
   socket.on('joinRoom', ({userId}) => {
     socket.join(userId);
-    console.log('connected! ' + userId);
   });
-  socket.on('notification', ({userId}) => {
-    io.to(userId).emit('notification', {
-      type: 'ADDED_TO_TEAM',
-      data: {
-        message: 'You have been added to a team.',
-      },
-    });
+  socket.on('notification', ({data, type}) => {
+    switch (type) {
+      case 'ADDED_TO_TEAM':
+        io.to(data.userId).emit('notification', {
+          type: 'ADDED_TO_TEAM',
+          data: {
+            message: 'You have been added to a team.',
+          },
+        });
+        break;
+      case 'TRANSACTION_ADDED':
+        data.users.forEach((user) => {
+          io.to(user).emit('notification', {
+            type: 'TRANSACTION_ADDED',
+            data: {
+              message: 'You have been added to a transaction.',
+            },
+          });
+        });
+        break;
+      default:
+        break;
+    }
   });
 };
