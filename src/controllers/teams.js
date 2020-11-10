@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const {populate} = require('../models/team');
 const Team = require('../models/team');
 const User = require('../models/user');
+const io = require('../../app').io;
 
 exports.getTeams = (req, res, next) => {
   Team.find()
@@ -67,7 +67,16 @@ exports.addUser = (req, res, next) => {
             {$push: {users: userId}},
             (err, team) => {
               if (err) res.status(500).json({error: err});
-              else res.json(user);
+              else {
+                res.json(user);
+                io.to(userId).emit('notification', {
+                  type: 'ADDED_TO_TEAM',
+                  data: {
+                    teamName: team.teamName,
+                    message: 'You have been added to a team.',
+                  },
+                });
+              }
             },
           );
         });

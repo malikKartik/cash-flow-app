@@ -199,3 +199,14 @@ exports.sendOtp = (req, res, next) => {
     }
   });
 };
+
+exports.getTeams = (req, res, next) => {
+  User.findById(req.body.id)
+    .populate('teams')
+    .then((user) => {
+      req.status(200).json(user.teams);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+};

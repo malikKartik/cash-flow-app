@@ -2,10 +2,16 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-
+const socketio = require('socket.io');
+const http = require('http');
 const {MONGO_URI} = require('./src/config/mongodb');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
+exports.io = io;
+const port = process.env.PORT || 3001;
+io.on('connection', require('./src/socket/socket').Socket);
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(cookieParser());
@@ -54,5 +60,6 @@ app.use((error, req, res, next) => {
     },
   });
 });
-
-module.exports = app;
+server.listen(port, () => {
+  console.log(`Server is up on port ${port}!`);
+});
