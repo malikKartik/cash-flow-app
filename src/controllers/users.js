@@ -22,7 +22,6 @@ exports.getUsers = (req, res, next) => {
 
 exports.create_a_user = (req, res, next) => {
   if (req.body.otp == otpMap.get(req.body.email)) {
-    console.log('otp correct!');
     User.find({
       $or: [{email: req.body.email}, {username: req.body.usename}],
     }).then((data) => {
@@ -84,11 +83,9 @@ exports.delete_a_user = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  console.log(req.body);
   User.find({$or: [{email: req.body.username}, {username: req.body.username}]})
     .populate('teams', 'teamName')
     .then((user) => {
-      console.log(user);
       if (user.length < 1) {
         return res.status(401).json({
           message: 'Auth failed!',
@@ -194,8 +191,6 @@ exports.sendOtp = (req, res, next) => {
       console.log(error);
     } else {
       res.status(200).json(info.response);
-      console.log('Email sent: ' + info.response);
-      console.log(otpMap);
     }
   });
 };

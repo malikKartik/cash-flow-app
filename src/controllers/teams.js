@@ -52,7 +52,6 @@ exports.addUser = (req, res, next) => {
   })
     .exec()
     .then((user) => {
-      console.log(user);
       let teams = [];
       teams = user.teams;
       if (teams.includes(teamId))
