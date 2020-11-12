@@ -25,6 +25,16 @@ exports.Socket = (socket) => {
           });
         });
         break;
+      case 'SETTLED_A_TRANSACTION':
+        data.users.forEach((user) => {
+          io.to(user._id).emit('notification', {
+            type: 'SETTLED_A_TRANSACTION',
+            data: {
+              placeId: data.placeId,
+            },
+          });
+        });
+        break;
       default:
         break;
     }
