@@ -16,6 +16,7 @@ exports.Socket = (socket) => {
         break;
       case 'TRANSACTION_ADDED':
         data.users.forEach((user) => {
+          console.log(user);
           io.to(user).emit('notification', {
             type: 'TRANSACTION_ADDED',
             data: {
