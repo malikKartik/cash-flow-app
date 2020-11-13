@@ -21,6 +21,7 @@ exports.Socket = (socket) => {
             type: 'TRANSACTION_ADDED',
             data: {
               message: 'You have been added to a transaction.',
+              teamId: data.teamId,
             },
           });
         });
