@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
 const successCodes = require('../responseCodes/successCodes').successCodes;
+const errorCodes = require('../responseCodes/errorCodes').errorCodes;
 
 let otpMap = new Map();
 
@@ -14,7 +15,7 @@ exports.getUsers = (req, res, next) => {
     .exec()
     .then((result) => res.status(201).json(result))
     .catch((err) =>
-      res.status(500).json({
+      res.status(errorCodes.INTERNAL_SERVER_ERROR.status).json({
         error: err,
       }),
     );
@@ -26,14 +27,14 @@ exports.create_a_user = (req, res, next) => {
       $or: [{email: req.body.email}, {username: req.body.usename}],
     }).then((data) => {
       if (data.length >= 1) {
-        return res.status(409).json({
-          message: 'Email exists!',
+        return res.status(errorCodes.SU_EMAIL_EXISTS.status).json({
+          ...errorCodes.SU_EMAIL_EXISTS,
         });
       } else {
         bcrypt.hash(req.body.password, 8, (err, hash) => {
           if (err) {
-            return res.status(500).json({
-              error: err,
+            res.status(errorCodes.INTERNAL_SERVER_ERROR.status).json({
+              ...errorCodes.INTERNAL_SERVER_ERROR,
             });
           } else {
             const user = new User({
@@ -47,22 +48,24 @@ exports.create_a_user = (req, res, next) => {
             user
               .save()
               .then((data) => {
-                res.json({
-                  message: 'User created!',
+                res.status(successCodes.SIGNUP.status).json({
+                  ...successCodes.SIGNUP,
                   id: data._id,
                   email: data.email,
                 });
               })
               .catch((e) => {
-                console.log(e);
+                res.status(errorCodes.INTERNAL_SERVER_ERROR.status).json({
+                  ...errorCodes.INTERNAL_SERVER_ERROR,
+                });
               });
           }
         });
       }
     });
   } else {
-    res.json({
-      message: 'Incorrect OTP!',
+    res.status(errorCodes.SU_INCORRECT_OTP.status).json({
+      ...errorCodes.SU_INCORRECT_OTP,
     });
   }
 };
@@ -76,7 +79,7 @@ exports.delete_a_user = (req, res, next) => {
     })
     .catch((e) => {
       console.log(e);
-      res.status(500).json({
+      res.status(errorCodes.INTERNAL_SERVER_ERROR.status).json({
         error: 'something went wrong!',
       });
     });
@@ -87,8 +90,9 @@ exports.login = (req, res, next) => {
     .populate('teams', 'teamName teamId secret')
     .then((user) => {
       if (user.length < 1) {
-        return res.status(401).json({
-          message: 'Auth failed!',
+        console.log({...errorCodes.LI_FAILURE});
+        return res.status(errorCodes.LI_FAILURE.status).json({
+          ...errorCodes.LI_FAILURE,
         });
       }
       bcrypt.compare(req.body.password, user[0].password, (err, result) => {
@@ -111,19 +115,18 @@ exports.login = (req, res, next) => {
             firstName: user[0].firstName,
             lastName: user[0].lastName,
             teams: user[0].teams,
-            MESSAGE: successCodes.LOGIN.message,
-            CODE: successCodes.LOGIN.code,
+            ...successCodes.LOGIN,
           });
         }
-        return res.status(401).json({
-          message: 'Auth failed!',
+        return res.status(errorCodes.LI_FAILURE.status).json({
+          ...errorCodes.LI_FAILURE,
         });
       });
     })
     .catch((e) => {
       console.log(e);
-      res.status(500).json({
-        error: 'something went wrong!',
+      res.status(errorCodes.INTERNAL_SERVER_ERROR.status).json({
+        ...errorCodes.INTERNAL_SERVER_ERROR,
       });
     });
 };
@@ -136,7 +139,7 @@ exports.getMyTeams = (req, res, next) => {
     .exec()
     .then((result) => res.status(201).json(result.teams))
     .catch((err) =>
-      res.status(500).json({
+      res.status(errorCodes.INTERNAL_SERVER_ERROR.status).json({
         error: err,
       }),
     );
@@ -145,14 +148,17 @@ exports.getMyTeams = (req, res, next) => {
 exports.validate = async (req, res, next) => {
   try {
     const token = req.body.token;
-    if (!token) res.status(401).send({error: 'Not authorized!'});
+    if (!token)
+      res
+        .status(errorCodes.NOT_AUTHORIZED.status)
+        .send({...errorCodes.NOT_AUTHORIZED});
     const decoded = jwt.verify(token, process.env.JWT_KEY || 'key');
     const userId = decoded.userId;
     const user = await User.find({_id: userId}).populate(
       'teams',
       'teamName teamId secret',
     );
-    res.send({
+    res.status(successCodes.VALIDATE.status).send({
       email: user[0].email,
       userId: user[0]._id,
       username: user[0].username,
@@ -160,14 +166,17 @@ exports.validate = async (req, res, next) => {
       lastName: user[0].lastName,
       teams: user[0].teams,
       token,
+      ...successCodes.VALIDATE,
     });
   } catch (err) {
-    res.status(401).send({error: 'Not authorized!'});
+    res
+      .status(errorCodes.NOT_AUTHORIZED.status)
+      .send({...errorCodes.NOT_AUTHORIZED});
   }
 };
 exports.logout = (req, res, next) => {
   res.clearCookie('jwt');
-  res.json({message: 'Success!'});
+  res.status(successCodes.LOGOUT.status).json({...successCodes.LOGOUT});
 };
 
 exports.sendOtp = (req, res, next) => {
@@ -190,10 +199,12 @@ exports.sendOtp = (req, res, next) => {
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      res.status(500).json(error);
+      res
+        .status(errorCodes.INTERNAL_SERVER_ERROR.status)
+        .json({...errorCodes.INTERNAL_SERVER_ERROR});
       console.log(error);
     } else {
-      res.status(200).json(info.response);
+      res.status(successCodes.SEND_OTP.status).json({...successCodes.SEND_OTP});
     }
   });
 };
@@ -202,9 +213,13 @@ exports.getTeams = (req, res, next) => {
   User.findById(req.body.id)
     .populate('teams')
     .then((user) => {
-      req.status(200).json(user.teams);
+      req
+        .status(successCodes.GET_TEAMS.status)
+        .json({...successCodes.GET_TEAMS});
     })
     .catch((err) => {
-      res.status(500).json(err);
+      res
+        .status(errorCodes.INTERNAL_SERVER_ERROR.status)
+        .json({...errorCodes.INTERNAL_SERVER_ERROR});
     });
 };

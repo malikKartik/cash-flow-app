@@ -17,6 +17,18 @@ exports.successCodes = {
     status: 200,
     toast: true,
   },
+  VALIDATE: {
+    code: 'AUTH104',
+    message: 'Validation successful',
+    status: 200,
+    toast: false,
+  },
+  SEND_OTP: {
+    code: 'AUTH105',
+    message: 'OTP sent',
+    status: 200,
+    toast: false,
+  },
   GET_TEAMS: {
     code: 'TEAM101',
     message: 'Teams received!',
