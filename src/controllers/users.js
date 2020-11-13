@@ -90,8 +90,7 @@ exports.login = (req, res, next) => {
     .populate('teams', 'teamName teamId secret')
     .then((user) => {
       if (user.length < 1) {
-        console.log({...errorCodes.LI_FAILURE});
-        return res.status(errorCodes.LI_FAILURE.status).json({
+        return res.status(400).send({
           ...errorCodes.LI_FAILURE,
         });
       }
@@ -180,7 +179,19 @@ exports.logout = (req, res, next) => {
 };
 
 exports.sendOtp = (req, res, next) => {
-  let otp = Math.floor(Math.random() * 100000000);
+  User.find({
+    $or: [{email: req.body.email}, {username: req.body.usename}],
+  }).then((data) => {
+    if (data.length >= 1) {
+      return res.status(errorCodes.SU_EMAIL_EXISTS.status).json({
+        ...errorCodes.SU_EMAIL_EXISTS,
+      });
+    }
+  });
+  let otp = Math.floor(Math.random() * 10000);
+  while (otp < 1000) {
+    otp = Math.floor(Math.random() * 10000);
+  }
   otpMap.set(req.body.email, otp);
   const transporter = nodemailer.createTransport({
     service: 'gmail',
